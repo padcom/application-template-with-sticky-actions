@@ -1,0 +1,21 @@
+{
+  "name": "@padcom/app-tmpl",
+  "version": "0.0.1",
+  "author": "Matthias Hryniszak <padcom@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "live-server ."
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "vue": "^3.4.15"
+  },
+  "homepage": "https://github.com/padcom/app-tmpl#readme",
+  "bugs": {
+    "url": "https://github.com/padcom/app-tmpl/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/padcom/app-tmpl.git"
+  }
+}

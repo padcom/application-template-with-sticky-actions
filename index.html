@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Example layout for the forms application</title>
+  <style>
+    /* This stylesheet is to show how a layout of an application is usually done.
+
+       Most of the time what you really want is that the elements behave like blocks in
+       the Tetris game - only upside down. If done properly, adding margins and paddings
+       makes for a predictable visual result.
+     */
+    html, body {
+      /* We are coloring the page red to see if the body is visible anywhere. It should not be
+         so whenever we see red there is something missing.
+       */
+      background-color: red;
+
+      /* Let's tell the browser that the page needs to occupy the entire height of the viewport. */
+      height: 100dvh;
+
+      /* Since the default is a bit of margin on the page we need to reset it here */
+      margin: 0;
+    }
+
+    #app {
+      /* For the most part the application should not be visible. We give it some color to see if
+         we didn't miss anything
+       */
+      background-color: yellow;
+
+      /* The application should occupy all the available space */
+      height: 100%;
+
+      /* Here is where the fun begins.
+         We're splitting the available space into two blocks:
+         - toolbar
+         - application content
+
+         It's very easy to do with a grid. First we define which areas should this grid concern itself with
+         and then we define how tall those should be. In a grid there are "rows", which have height and
+         "columns" which have width. Please note the notation of grid areas: those are put together in
+         quotes row above row. It doesn't have to be spelled out like that but it helps read the code
+         later on. Google Chrome formats template areas the same way, so it makes for an easier read.
+       */
+      display: grid;
+      grid-template-areas:
+        "toolbar"
+        "content";
+      /* For our purposes we need the toolbar to be as high as it needs to be and the content to
+         occupy the remainder of the available space. That's what the "fr" unit means - the "remainder"
+         or rather "fraction of the remaining space". It can be a whole number or a fraction. "1fr" means
+         "use all remaining space" if used in conjunction with space-limiting values such as min-/max-content
+         or minmax() function.
+
+         The difference between min-content and max-content is mostly visible horizontally rather than
+         vertically (so with grid-template-columns). If min-content is used and the content can be broken into
+         multiple lines it will. With max-content the grid will try to fit the entire content in one line.
+       */
+      grid-template-rows: max-content 1fr;
+
+      /* Using the ampersand here is not importamt but it is a good practice in nested CSS.
+         Where it will be absolutely necessary is if you have an element specifier (such as "input" or "label").
+         The rule here is that the first element of the selector cannot be a letter. It can be an ampersand,
+         a dot (from a class selector), a direct child specifier (>) or any other non-letter.
+         We always use the & to make it more visible what the selector stands for, even in combination with
+         the direct child selector, like this:
+
+         body {
+           & > .toolbar {
+             ....
+           }
+         }
+       */
+      & .toolbar {
+        background-color: antiquewhite;
+
+        /* This is how we put an element inside a grid at a specific place, or "area" */
+        grid-area: toolbar;
+      }
+
+      & .content {
+        background-color: cadetblue;
+
+        grid-area: content;
+
+        /* Our forms are usually much taller than the 100dvh so we need to tell the browser to
+           essentially hide whatever spills out. This will also make the size always fit the space
+           that is given by the 1fr grid row.
+         */
+        overflow: hidden;
+
+        display: grid;
+        /* This is how you could define the behavior of columns so that they fluctuate between 320px and
+           640px and be centered. The dot (.) is just an unnammed column, that we can define the width of
+           later on using grid-template-columns
+         */
+        grid-template-areas:
+          ". header ."
+          ". form .";
+        /* In this case, the minmax() function defines the minimum and maximum width of the center column */
+        grid-template-columns: 1fr minmax(320px, 640px) 1fr;
+        grid-template-rows: max-content 1fr;
+
+        & .header {
+          background-color: green;
+
+          grid-area: header;
+        }
+
+        & .form {
+          background-color: darkgoldenrod;
+
+          grid-area: form;
+
+          /* Since the form will be higher that the allowed content we need to clip it
+             the same way as the ".content" div.
+           */
+          overflow: hidden;
+
+          display: grid;
+          /* Again, we use the grid to lay out the content of the form */
+          grid-template-areas:
+            "fields"
+            "actions";
+          grid-template-rows: 1fr max-content;
+
+          & .fields {
+            background-color: palegreen;
+
+            grid-area: fields;
+
+            /* The ".fields" element should scroll if there is more content to display. It is the only
+               element that should have a scrollbar visible.
+             */
+            overflow: auto;
+
+            & .field {
+              /* Here we're using CSS Grid to evenly lay out inputs. It isn't necessary but helps
+                 visually in the example. In the finall application it is done differently but it
+                 does not matter. The way it is done there is good. Here it is just for demonstration.
+               */
+              display: grid;
+              /* You can also use bigger numbers for fractions. The grid will distribute the remaining
+                available space proportionally to the given fractions. So here we have a 10-column grid,
+                where 3 columns are occupied by the first element of the field (in our case it is the label)
+                and 7 columns are occupied by the input field.
+               */
+              grid-template-columns: 3fr 7fr;
+            }
+          }
+
+          & .actions {
+            background-color: cornsilk;
+
+            grid-area: actions;
+          }
+        }
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="toolbar">
+      <select class="language-selector">
+        <option>English</option>
+      </select>
+    </div>
+    <div class="content">
+      <div class="header">
+        I am the header
+      </div>
+      <form class="form">
+        <div class="fields">
+          <div v-for="i in 30" class="field">
+            <label :for="`field${i}`">Field {{ i }}</label>
+            <input :id="`field${i}`" type="text">
+          </div>
+        </div>
+        <div class="actions">
+          <input type="reset">
+          <input type="submit">
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Just Vue.js stuff - not important. -->
+  <script type="importmap">
+    {
+      "imports": {
+        "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+      }
+    }
+  </script>
+  <script type="module">
+    import { createApp } from 'vue'
+
+    createApp().mount('#app')
+  </script>
+</body>
+</html>
